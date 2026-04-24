@@ -1,33 +1,41 @@
-# Multilingual Memes Classification: Harmful vs Non-Harmful Detection
+# Harmful Meme Detection in Indic Languages: Dataset Curation and Baseline Development
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Akhilesh348/Multilingual-Memes-Classification-Harmful-Non-Harmful-/blob/main/)
 
-A comprehensive deep learning framework for classifying memes as harmful or non-harmful across multiple languages using multi-modal feature extraction and fusion techniques.
+**Research Project** | Indian Institute of Technology Gandhinagar  
+**Authors**: B Keerthan Varma, K Dinesh Siddhartha, K Hemanth, M Lakshmi Manasa, Praveen Kumar, R Bhavana, V Venkat Akhilesh Naik
+
+A comprehensive deep learning framework for zero-shot harmful meme detection across Indic languages (Hindi, Telugu, Tamil, and Kannada) using multi-modal feature extraction and fusion techniques.
 
 ---
 
 ## Overview
 
-This project implements a sophisticated multi-modal approach to detect harmful content in memes by combining:
-- **Global image features** via CLIP embeddings
-- **Local image features** via VGG19 with selective search
-- **Text extraction** from meme images using OCR
-- **Semantic relationships** via ConceptNet encoding
+Memes have become a prevalent form of communication on social media, but many contain harmful content including misinformation, stereotypes, and hate speech. This research addresses the critical need for automatic harmful meme detection in Indic languages, where limited computational resources and linguistic diversity present unique challenges.
 
-The framework supports multilingual meme analysis (Telugu and English) and leverages state-of-the-art deep learning models for robust harmful content detection.
+### Key Innovation
+We curate large-scale Indic meme datasets and develop baseline models for zero-shot harmful meme detection by integrating:
+- **Global image features** via CLIP embeddings (vision-language understanding)
+- **Local image features** via VGG19 with selective search (region-based analysis)
+- **Multilingual text extraction** using IndicBERT (Indic language NLP)
+- **Semantic relationships** via ConceptNet (background knowledge)
+
+These embeddings are fused using **self-attention and cross-attention mechanisms**, followed by neural network layers for binary harmful/non-harmful classification. This multi-modal approach captures textual cues, visual semantics, and contextual interpretations critical for accurate classification.
 
 ---
 
 ## Key Features
 
-- **Multi-Modal Feature Extraction**: Combines visual and textual information for comprehensive meme understanding
-- **Multilingual Support**: Handles Telugu and English text within meme images
-- **CLIP Integration**: Utilizes OpenAI's CLIP model for vision-language embeddings
-- **Local Feature Extraction**: Advanced selective search with VGG19 for region-based features
-- **OCR Processing**: GPU-accelerated image preprocessing with Tesseract OCR
-- **Semantic Understanding**: ConceptNet integration for extracting semantic concepts and relationships
-- **CUDA Support**: Optimized for GPU acceleration where available
-- **Scalable Architecture**: Batch processing with multiprocessing support
+- **Multi-Modal Feature Extraction**: Combines visual, textual, and semantic information for comprehensive meme understanding
+- **Indic Language Support**: First-of-its-kind datasets for Hindi, Telugu, Tamil, and Kannada; uses IndicBERT for language-specific NLP
+- **Vision-Language Integration**: CLIP embeddings for semantic image understanding + IndicBERT for text interpretation
+- **Local Feature Extraction**: Selective search with VGG19 for region-of-interest (ROI) analysis; extracts entity and contextual features
+- **Semantic Knowledge**: ConceptNet integration for background knowledge, concept extraction, and implicit harm reasoning
+- **Attention-Based Fusion**: Self-attention and cross-attention mechanisms for multimodal embedding fusion
+- **Hybrid Annotation Pipeline**: LLM-assisted reasoning combined with manual verification for dataset quality
+- **Balanced Evaluation**: Macro-F1 scoring and category-wise train-test splits to address dataset imbalances
+- **GPU Acceleration**: CUDA optimization and efficient batch processing for scalability
+- **Zero-Shot Capabilities**: Leverages pre-trained models for classification without task-specific pre-training
 
 ---
 
@@ -49,25 +57,72 @@ The framework supports multilingual meme analysis (Telugu and English) and lever
 
 ---
 
+## Dataset Overview
+
+### Curated Indic Meme Datasets
+
+We created the first large-scale harmful meme datasets for Indic languages:
+
+| Language | Harmful | Non-Harmful | Total | Ratio | Source |
+|----------|---------|-------------|-------|-------|--------|
+| **Hindi** | 3,776 | 3,070 | 6,846 | 1.23:1 | Memotion3 + MIMIC + Web-scraped |
+| **Telugu** | 965 | 1,970 | 2,935 | 1:2 | Handcrafted from scratch* |
+| **Tamil** | 1,282 | 1,018 | 2,300 | 1.26:1 | TamilMemes (curated) |
+| **Kannada** | 573 | 1,064 | 1,637 | 1:2 | Handcrafted from scratch* |
+| **TOTAL** | **6,596** | **7,122** | **13,718** | ~0.93:1 | - |
+
+**\* First open-source datasets for Telugu and Kannada harmful memes**
+
+**Dataset Link**: https://iitgnacin-my.sharepoint.com/personal/23110168_iitgn_ac_in/Documents/Memes%20Dataset
+
+### Data Characteristics
+- **Train/Dev/Test Split**: 60% / 20% / 20%
+- **Bias Mitigation**: Category-wise distribution to ensure proportional harmful/harmless representation
+- **Identity Overlap Prevention**: Memes depicting the same person distributed across splits
+- **Annotation Quality**: Hybrid LLM + manual verification pipeline
+
+### Data Challenges
+- LLM-based automatic labeling struggled with subtle harmful intent
+- Limited publicly available Indic meme resources required manual curation
+- Low-resolution memes were discarded due to OCR preprocessing failures
+
+---
+
 ## Installation & Setup
 
 ### Prerequisites
 
-- Python 3.7+
-- CUDA 11.0+ (recommended for GPU acceleration)
-- 8GB+ RAM
-- GPU with 4GB+ VRAM (optional but recommended)
+- **Python**: 3.7 or higher
+- **GPU**: NVIDIA GPU with 4GB+ VRAM (recommended; CPU mode available)
+- **CUDA**: 11.0+ for GPU acceleration
+- **RAM**: 8GB+ system memory
+- **Storage**: 20GB+ for models, datasets, and outputs
 
 ### Dependencies
 
 Install all required packages:
 
 ```bash
+# Core deep learning
 pip install torch torchvision torchaudio
+
+# Transformers and language models
 pip install transformers tqdm pillow pandas numpy
+
+# Computer vision and preprocessing
 pip install scikit-learn opencv-python scikit-image
+
+# NLP and text processing
 pip install pytesseract spacy sentence-transformers
+
+# IndicBERT for Indic language support
+pip install indic-nlp-library
+
+# Visualization and notebooks
 pip install matplotlib jupyter
+
+# ConceptNet (optional, can use API)
+pip install conceptnet
 ```
 
 **Optional GPU-specific setup:**
@@ -81,10 +136,14 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 - **Linux**: `sudo apt-get install tesseract-ocr`
 - **macOS**: `brew install tesseract`
 
-**spaCy model:**
+**spaCy model for NER:**
 ```bash
 python -m spacy download en_core_web_sm
 ```
+
+**IndicBERT model (Indic language BERT):**
+- Automatically downloaded on first use via Hugging Face transformers
+- Model: `ai4bharat/IndicBERTv2-MLM` (supports all Indic languages)
 
 ---
 
@@ -165,12 +224,14 @@ JSONL format:
 - **Max Proposals**: 50 per image
 - **Min Area**: 5000 pixels
 
-### Text Features (Multilingual)
-- **OCR Engine**: Tesseract
-- **Languages**: Telugu, English
+### Text Features (Multilingual with IndicBERT)
+- **Primary Model**: `IndicBERT` (AI4Bharat)
+- **Supported Languages**: Hindi, Telugu, Tamil, Kannada, English
+- **OCR Engine**: Tesseract (for text extraction from images)
 - **Preprocessing**: GPU-accelerated bilateral filtering
-- **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2`
-- **Output Dimension**: 384
+- **Fallback Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` (multilingual support)
+- **Output Dimension**: 768 (IndicBERT) / 384 (Sentence Transformers)
+- **Special Feature**: Captures language-specific linguistic nuances and cultural context
 
 ### Semantic Features (ConceptNet)
 - **Captioning Model**: `nlpconnect/vit-gpt2-image-captioning`
@@ -181,39 +242,80 @@ JSONL format:
 
 ---
 
-## Performance Metrics
+## Evaluation Metrics & Results
 
-The framework evaluates classification performance using:
-- **Accuracy**: Overall correctness
-- **Precision & Recall**: Per-class performance
-- **F1-Score**: Harmonic mean of precision and recall
+### Primary Metrics
+- **Macro-F1 Score**: Primary evaluation metric to handle class imbalance between harmful and harmless memes
+- **Accuracy**: Overall classification correctness
+
+### Ablation Study Results
+
+**Validation Performance**:
+
+| Language | Learning Rate | Batch Size | Macro-F1 | Accuracy |
+|----------|--------------|------------|----------|----------|
+| Hindi | 1e-3 | 32 | 0.41 | 0.45 |
+| Hindi | 1e-5 | 32 | 0.37 | 0.41 |
+| Tamil | 1e-3 | 32 | 0.32 | 0.36 |
+| Tamil | 1e-5 | 32 | 0.39 | 0.43 |
+| Telugu | 1e-3 | 32 | 0.35 | 0.39 |
+| Telugu | 1e-5 | 32 | 0.40 | 0.44 |
+| Kannada | 1e-3 | 32 | 0.35 | 0.39 |
+| Kannada | 1e-5 | 32 | 0.37 | 0.43 |
+
+**Test Performance**:
+
+| Language | Learning Rate | Batch Size | Macro-F1 | Accuracy |
+|----------|--------------|------------|----------|----------|
+| Hindi | 1e-3 | 32 | 0.39 | 0.43 |
+| Hindi | 1e-5 | 32 | 0.36 | 0.40 |
+| Tamil | 1e-3 | 32 | 0.30 | 0.33 |
+| Tamil | 1e-5 | 32 | 0.38 | 0.41 |
+| Telugu | 1e-3 | 32 | 0.34 | 0.38 |
+| Telugu | 1e-5 | 32 | 0.39 | 0.42 |
+| Kannada | 1e-3 | 32 | 0.33 | 0.37 |
+| Kannada | 1e-5 | 32 | 0.37 | 0.41 |
+
+### Key Findings
+- **Lower learning rates (1e-5) yield more stable training** and better generalization
+- **Validation and test scores are closely aligned**, indicating decent generalization capability
+- **Performance constrained by limited training data** (15% of full dataset due to computational limits)
+- **Consistent performance across languages** despite differences in dataset size and linguistic diversity
+- Performance improvements expected with full dataset training and expanded computational resources
+
+### Additional Metrics
+- **Precision & Recall**: Per-class performance analysis
+- **Confusion Matrix**: Detailed per-class breakdown
 - **ROC-AUC**: Area under the receiver operating characteristic curve
-- **Confusion Matrix**: Per-class breakdown
-- **Hamming Loss**: Multi-label classification metric
-- **MAE**: Mean absolute error for regression tasks
 
 ---
 
 ## Feature Fusion Pipeline
 
 ```
-Input Image
-    ↓
-┌───────────────────────────────────────┐
-│         Multi-Modal Extraction        │
-├───────────────────────────────────────┤
-│  ├─ Global Features (CLIP)            │
-│  ├─ Local Features (VGG19)            │
-│  ├─ Text Features (OCR + Transformers)│
-│  └─ Semantic Features (ConceptNet)    │
-├───────────────────────────────────────┤
-│      Feature Fusion/Concatenation     │
-├───────────────────────────────────────┤
-│    Classification Model (Trained)     │
-├───────────────────────────────────────┤
-│  Output: [Harmful / Non-Harmful]      │
-└───────────────────────────────────────┘
+Input Meme Image
+        ↓
+┌──────────────────────────────────────────────────────┐
+│      Multi-Modal Feature Extraction                  │
+├──────────────────────────────────────────────────────┤
+│  ├─ Global Visual (CLIP)         → 512-dim vector   │
+│  ├─ Local Visual (VGG19 ROI)     → 4096-dim vector  │
+│  ├─ Text (IndicBERT)            → 768-dim vector   │
+│  └─ Semantic (ConceptNet)       → N-dim vector     │
+├──────────────────────────────────────────────────────┤
+│   Attention-Based Fusion Mechanisms                  │
+│   ├─ Self-Attention (per modality)                  │
+│   └─ Cross-Attention (inter-modal interactions)     │
+├──────────────────────────────────────────────────────┤
+│   Concatenated Multimodal Embedding                  │
+│        ↓ (Neural Network Layers)                     │
+│   Binary Classification Head                         │
+├──────────────────────────────────────────────────────┤
+│  Output: [Harmful / Non-Harmful] + Confidence Score │
+└──────────────────────────────────────────────────────┘
 ```
+
+**Architecture Parameter Count**: 3.74M parameters (excluding frozen encoders)
 
 ---
 
@@ -273,30 +375,62 @@ This project is based on research presented at EMNLP/MOMENTA:
 
 ---
 
-## Configuration Options
+## Training Configuration
 
-Key configuration parameters in notebooks:
+### Model Training Setup
+All pre-trained encoders (IndicBERT, CLIP, VGG-19, ConceptNet) were frozen, while only final neural layers were trained:
 
 ```python
-# Global Image Features
+# Optimizer Configuration
+optimizer = "Adam"
+learning_rate = [1e-3, 1e-5]  # Tested both
+epochs = 20
+batch_size = 32
+
+# Data Split
+train_ratio = 0.60
+dev_ratio = 0.20
+test_ratio = 0.20
+
+# Training Constraint
+full_dataset_usage = 15  # percent (due to computational limits)
+```
+
+### Key Configuration Parameters
+
+```python
+# Global Image Features (CLIP)
 CLIP_MODEL = "openai/clip-vit-base-patch32"
-BATCH_SIZE = 32
+CLIP_OUTPUT_DIM = 512
 
-# Local Image Features
-MAX_PROPOSALS = 50
-MIN_PROP_AREA = 5000
-IOU_THRESHOLD = 0.95
+# Local Image Features (VGG19)
+MAX_PROPOSALS = 50  # max ROI proposals per image
+MIN_PROP_AREA = 5000  # minimum proposal area in pixels
+IOU_THRESHOLD = 0.95  # intersection-over-union threshold
+VGG19_OUTPUT_DIM = 4096
 
-# Text Extraction
-OCR_LANGUAGES = "tel+eng"  # Telugu + English
-USE_PREPROCESS = True
+# Text Extraction (Multilingual)
+OCR_LANGUAGES = "tel+eng+hin+tam+kan"  # All Indic languages
+TEXT_MODEL = "ai4bharat/IndicBERTv2-MLM"  # IndicBERT
+USE_GPU_PREPROCESS = True
 WORKERS = 2
 
-# Semantic Features
-TOP_N_CONCEPTNET = 10
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+# Semantic Features (ConceptNet)
+TOP_N_CONCEPTNET = 10  # top N concepts extracted
 CAPTION_MODEL = "nlpconnect/vit-gpt2-image-captioning"
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+# Attention Fusion
+USE_SELF_ATTENTION = True
+USE_CROSS_ATTENTION = True
+ATTENTION_HEADS = 8
 ```
+
+### Computational Resources Used
+- **GPU**: 7x T4 GPU (15 GB each) on Google Colab
+- **CPU**: 7x 1 core
+- **RAM**: 7x 12.7 GB RAM
+- **Storage**: 20 GB out of 700 GB available
 
 ---
 
@@ -343,6 +477,19 @@ if torch.cuda.device_count() > 1:
 
 ---
 
+## Team & Contributors
+
+**Research Team** (Indian Institute of Technology Gandhinagar):
+- **B Keerthan Varma** - Dataset curation, Documentation, Report writing, Experimentation
+- **K Dinesh Siddhartha** - Dataset curation, ConceptNet integration, Experimentation
+- **K Hemanth** - Dataset curation, Data preprocessing, ConceptNet integration
+- **M Lakshmi Manasa** - Dataset curation, Evaluation metrics, Ablation analysis
+- **Praveen Kumar** - Dataset curation, Model training, Image encoder integration
+- **R Bhavana** - Dataset curation, Documentation, Result summarization
+- **V Venkat Akhilesh Naik** - Dataset curation, Hyperparameter tuning, IndicBERT integration
+
+---
+
 ## License
 
 This project is licensed under the **MIT License**. See [LICENSE.txt](LICENSE.txt) for details.
@@ -382,18 +529,30 @@ For questions, issues, or collaborations:
 
 ## Citation
 
-If you use this project in your research, please cite:
+If you use this project or datasets in your research, please cite:
 
 ```bibtex
-@software{sharma2021multilingual_memes,
-  title={Multilingual Memes Classification: Harmful vs Non-Harmful Detection},
-  author={Sharma, Shivam},
-  year={2021},
-  url={https://github.com/Akhilesh348/Multilingual-Memes-Classification-Harmful-Non-Harmful-}
+@inproceedings{varma2024harmful,
+  title={Harmful Meme Detection in Indic Languages: Dataset Curation and Baseline Development},
+  author={Varma, B Keerthan and Siddhartha, K Dinesh and Hemanth, K and Manasa, M Lakshmi and Kumar, Praveen and Bhavana, R and Naik, V Venkat Akhilesh},
+  booktitle={Indian Institute of Technology Gandhinagar},
+  year={2024}
 }
 ```
 
 ---
 
+## References
+
+- **MOMENTA Paper**: https://arxiv.org/pdf/2109.05184 (Multi-modal fusion architecture)
+- **MIND Paper**: https://arxiv.org/pdf/2507.06908 (Zero-shot harmful content detection)
+- **IndicBERT**: AI4Bharat's language model for Indic languages
+- **CLIP**: Radford et al., OpenAI (Vision-Language pretraining)
+- **VGG19**: Simonyan & Zisserman (Deep CNN architecture)
+- **ConceptNet**: Speer et al. (Knowledge graph resource)
+
+---
+
 **Last Updated**: April 2026  
-**Version**: 1.0.0
+**Version**: 2.0.0 (Research Edition)  
+**Status**: Active Research Project
