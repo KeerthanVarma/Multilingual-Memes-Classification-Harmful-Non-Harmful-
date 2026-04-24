@@ -527,20 +527,7 @@ For questions, issues, or collaborations:
 
 ---
 
-## Citation
 
-If you use this project or datasets in your research, please cite:
-
-```bibtex
-@inproceedings{varma2024harmful,
-  title={Harmful Meme Detection in Indic Languages: Dataset Curation and Baseline Development},
-  author={Varma, B Keerthan and Siddhartha, K Dinesh and Hemanth, K and Manasa, M Lakshmi and Kumar, Praveen and Bhavana, R and Naik, V Venkat Akhilesh},
-  booktitle={Indian Institute of Technology Gandhinagar},
-  year={2024}
-}
-```
-
----
 
 ## References
 
